@@ -4,9 +4,8 @@ USING: accessors alien.c-types alien.data assocs byte-arrays
 byte-vectors colors.constants compiler.units core-graphics.types
 definitions fonts formatting fry hints io io.binary kernel
 kernel.private locals macros make math math.order math.parser
-namespaces prettyprint.sections sequences slots.private sorting syslog
-typed ui.commands ui.gestures ui.text ui.tools.listener vocabs.loader
-vocabs.parser ;
+namespaces prettyprint.sections sequences slots.private sorting
+typed ui.tools.common ui.commands ui.gestures ui.text ui.tools.listener vocabs.loader splitting.extras vocabs.parser cocoa.classes ;
 
 ! IN: shuffle
 ! FORGET: 4drop
@@ -16,20 +15,28 @@ IN: ui.backend
 
 IN: cocoa
 
-! : screen-size ( -- size )
-!     { }
-!       NSScreen -> mainScreen -> frame
-!       size>> dup
-!       [ w>> prefix ] dip
-!       h>> suffix ;
+: screen-size ( -- size )
+    { }
+      NSScreen -> mainScreen -> frame
+      size>> dup
+      [ w>> prefix ] dip
+      h>> suffix ;
 
 : auto-position ( window loc -- )
     #! Note: if this is the initial window, the length of the windows
     #! vector should be 1, since (open-window) calls auto-position
     #! after register-window.
-    SYSLOG_HERE
     dup { 0 0 } =
     [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
+
+! setup tool dimensions to be half screen size
+: set-tool-dimensions ( -- )
+    screen-size [ 2 / ] map
+    listener-gadget
+    tool-dims get-global
+    set-at ;
+
+set-tool-dimensions
 
 IN: ui
 FROM: ui.private => windows ;
@@ -87,8 +94,8 @@ MACRO: ?dup ( n -- quot ) dup zero? [ [ ] ] [ [ dup ] ] if ;
 
 IN: strings
 M: string underlying>>  2 slot { string } declare ; inline
-: to-string ( obj -- string )
-    "%@" sprintf ;
+! : to-string ( obj -- string )
+!     "%@" sprintf ;
 : dequote ( string -- 'string )
     CHAR: " swap [ = not ] with filter ;
 
