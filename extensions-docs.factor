@@ -15,8 +15,9 @@ HELP: unique-filter
 { $notes "No Notes" }
 ;
 
-ARTICLE: "extensions" "extensions"
+ARTICLE: "extensions" "Factor extensions"
 { $vocab-link "extensions" }
+"\nContains extensions to existing vocabularies in the Factor folder which have not yet been incorporated into the master branch. This permits adding to existing vocabularies without cluttering the current commit or to add to vocabularies personal preferences"
 ;
 
 ABOUT: "extensions"

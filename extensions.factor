@@ -4,8 +4,9 @@ USING: accessors alien.c-types alien.data assocs byte-arrays
 byte-vectors colors.constants compiler.units core-graphics.types
 definitions fonts formatting fry hints io io.binary kernel
 kernel.private locals macros make math math.order math.parser
-namespaces prettyprint.sections sequences slots.private sorting
-typed ui.tools.common ui.commands ui.gestures ui.text ui.tools.listener vocabs.loader splitting.extras vocabs.parser cocoa.classes ;
+namespaces prettyprint.sections sequences sequences.private slots.private sorting 
+typed ui.tools.common ui.commands ui.gestures ui.text ui.tools.listener vocabs.loader
+splitting splitting.extras vocabs.parser cocoa.classes ;
 
 ! IN: shuffle
 ! FORGET: 4drop
