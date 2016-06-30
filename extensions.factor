@@ -115,6 +115,19 @@ M: string underlying>>  2 slot { string } declare ; inline
 : dequote ( string -- 'string )
     CHAR: \" swap [ = not ] with filter ;
 
+: string-trim-head ( str -- str )
+    R/ ^\s+/ "" re-replace ;
+
+: string-trim-tail ( str -- str )
+    reverse  string-trim-head  reverse ;
+
+: string-squeeze-spaces ( str -- str )
+    ! squezze inside spaces to one
+    R/ \s+/ " " re-replace
+    ;
+
+: string-trim ( str -- str )
+    string-trim-head  string-trim-tail ;
 
 FROM: assocs => values ;
 IN: ui.gadgets.world
