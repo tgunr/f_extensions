@@ -1,12 +1,13 @@
 ! Copyright (C) 2012 PolyMicro Systems.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data assocs byte-arrays
-byte-vectors colors.constants compiler.units core-graphics.types
-definitions fonts formatting fry hints io io.binary kernel
-kernel.private locals macros make math math.order math.parser
-namespaces prettyprint.sections sequences sequences.private slots.private sorting 
-typed ui.tools.common ui.commands ui.gestures ui.text ui.tools.listener vocabs.loader
-splitting splitting.extras vocabs.parser cocoa.classes ;
+byte-vectors cocoa.classes colors.constants compiler.units
+core-graphics.types definitions fonts formatting fry hints io
+io.binary kernel kernel.private locals macros make math math.order
+math.parser namespaces prettyprint.sections regexp sequences
+sequences.private slots.private sorting splitting.extras typed
+ui.commands ui.gestures ui.text ui.tools.common ui.tools.listener
+vocabs.loader vocabs.parser ;
 
 ! IN: shuffle
 ! FORGET: 4drop
@@ -82,8 +83,7 @@ IN: listener
 ! M: folder-entry pprint* pprint-object ;
 
 IN: kernel
-: 0? ( n -- n ? )
-    dup zero? ;
+: 0? ( n -- n ? ) dup zero? ;
 : 0= ( n -- ? ) 0 = ;
 : 0≠ ( n -- ? ) 0 = not ;
 : ≠ ( n n -- ? ) = not ;
