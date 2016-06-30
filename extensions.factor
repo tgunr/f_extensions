@@ -98,13 +98,12 @@ IN: kernel
 : 8+ ( n -- n ) 8 + ;
 : 8- ( n -- n )  8 - ;
 
-MACRO: ?dup ( n -- quot ) dup zero? [ [ ] ] [ [ dup ] ] if ;
+! MACRO: ?dup ( n -- quot )
+!     dup number? [ dup zero? [ [ ] ] [ dup ] if ] [ [ ] ] if 
+!     ;
 
 IN: strings
 M: string underlying>>  2 slot { string } declare ; inline
-! : to-string ( obj -- string )
-!     "%@" sprintf ;
-: string>seq ( string -- seq )   " " split ;
 : string-expand ( string -- seq ) [ 1string ] { } map-as ; 
 : bool>string ( ? -- s )   [ "t" ] [ "f" ] if ;
 
