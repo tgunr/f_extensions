@@ -1,13 +1,16 @@
 ! Copyright (C) 2012 PolyMicro Systems.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien.c-types alien.data assocs byte-arrays
 byte-vectors cocoa.classes colors.constants compiler.units
-core-graphics.types definitions fonts formatting fry hints io
-io.binary kernel kernel.private locals macros make math math.order
-math.parser namespaces prettyprint.sections regexp sequences
-sequences.private slots.private sorting splitting.extras typed
-ui.commands ui.gestures ui.text ui.tools.common ui.tools.listener
-vocabs.loader vocabs.parser ;
+core-graphics.types definitions effects effects.parser fonts fry
+hints io io.binary kernel kernel.private locals macros make math
+math.order math.parser namespaces parser prettyprint.sections
+regexp sequences sequences.private slots.private sorting
+splitting.extras typed ui.commands ui.gestures ui.text
+ui.tools.common ui.tools.listener vocabs.loader vocabs.parser
+words words.constant ;
+
 
 ! IN: shuffle
 ! FORGET: 4drop
@@ -98,9 +101,15 @@ IN: kernel
 : 8+ ( n -- n ) 8 + ;
 : 8- ( n -- n )  8 - ;
 
-! MACRO: ?dup ( n -- quot )
-!     dup number? [ dup zero? [ [ ] ] [ dup ] if ] [ [ ] ] if 
-!     ;
+: (se:) ( effect -- word def effect )
+    [ scan-new-word swap parse-definition swap ]
+    with-definition ;
+
+! SYNTAX: SETCONSTANT: { } { "n" } <effect> (se:) define-declared ;
+
+MACRO: ?dup ( n -- quot )
+    dup number? [ dup zero? [ [ ] ] [ dup ] if ] [ [ ] ] if 
+    call ; 
 
 IN: strings
 M: string underlying>>  2 slot { string } declare ; inline
