@@ -5,7 +5,7 @@ byte-vectors colors.constants compiler.units core-graphics.types
 definitions fonts formatting fry hints io io.binary kernel
 kernel.private locals macros make math math.order math.parser
 namespaces prettyprint.sections sequences sequences.private slots.private sorting 
-typed ui.tools.common ui.commands ui.gestures ui.text ui.tools.listener vocabs.loader
+typed ui.tools.common ui.commands ui.gestures ui.text ui.tools.listener vocabs vocabs.loader
 splitting splitting.extras vocabs.parser cocoa.classes ;
 
 ! IN: shuffle
@@ -24,28 +24,28 @@ IN: cocoa
       h>> suffix ;
 
 : auto-position ( window loc -- )
-    #! Note: if this is the initial window, the length of the windows
-    #! vector should be 1, since (open-window) calls auto-position
-    #! after register-window.
+    ! Note: if this is the initial window, the length of the windows
+    ! vector should be 1, since (open-window) calls auto-position
+    ! after register-window.
     dup { 0 0 } =
     [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
 ! setup tool dimensions to be half screen size
-: set-tool-dimensions ( -- )
-    screen-size [ 2 / ] map
-    listener-gadget
-    tool-dims get-global
-    set-at ;
+! : set-tool-dimensions ( -- )
+!     screen-size [ 2 / ] map
+!     listener-gadget
+!     get-tool-dim
+!     set-at ;
 
-set-tool-dimensions
+! set-tool-dimensions
 
 IN: ui
-FROM: ui.private => windows ;
+FROM: ui.private => ui-windows ;
 : (title-is=?) ( world string -- bool )
     swap title>>  = ;
 
 : window-find-title ( string -- handle )
-    windows get
+    ui-windows get
     [ second over (title-is=?) ] filter
     first first swap drop ;
 
@@ -82,28 +82,44 @@ IN: listener
 ! M: folder-entry pprint* pprint-object ;
 
 IN: kernel
-: is-zero? ( n -- n ? )
+: 0? ( n -- n ? )
     dup zero? ;
 : 0= ( n -- ? ) 0 = ;
 : 0≠ ( n -- ? ) 0 = not ;
 : ≠ ( n n -- ? ) = not ;
 : 1+ ( n -- n ) 1 + ;
 : 1- ( n -- n )  1 - ;
-! MACRO: ?dup ( n -- n n )
-!     is-zero? [ dup ] unless ;
+: 2+ ( n -- n ) 2 + ;
+: 2- ( n -- n )  2 - ;
+: 3+ ( n -- n ) 3 + ;
+: 3- ( n -- n )  3 - ;
+: 4+ ( n -- n ) 4 + ;
+: 4- ( n -- n )  4 - ;
+: 8+ ( n -- n ) 8 + ;
+: 8- ( n -- n )  8 - ;
+
 MACRO: ?dup ( n -- quot ) dup zero? [ [ ] ] [ [ dup ] ] if ;
 
 IN: strings
 M: string underlying>>  2 slot { string } declare ; inline
 ! : to-string ( obj -- string )
 !     "%@" sprintf ;
+: string>seq ( string -- seq )   " " split ;
+: string-expand ( string -- seq ) [ 1string ] { } map-as ; 
+: bool>string ( ? -- s )   [ "t" ] [ "f" ] if ;
+
+: chop ( str -- str )
+    dup length dup
+    [ 1- swap resize ]  [ drop ] if ;
+
 : dequote ( string -- 'string )
-    CHAR: " swap [ = not ] with filter ;
+    CHAR: \" swap [ = not ] with filter ;
+
 
 FROM: assocs => values ;
 IN: ui.gadgets.world
 : front-window ( -- world )
-    windows get
+    ui-windows get
     [ second focused?>> ] map-find nip
     second ; 
 
@@ -252,7 +268,7 @@ IN: vocabs
     [ lookup-vocab forget-vocab ] with-compilation-unit ;
 
 : forget-vocab-words ( vocab-spec -- )
-    [ lookup-vocab words forget-all ] with-compilation-unit ;
+    [ lookup-vocab vocab-words [ forget-all ] when* ] with-compilation-unit ;
 
 : reload-current-vocab ( -- )
     current-vocab name>> reload ;
