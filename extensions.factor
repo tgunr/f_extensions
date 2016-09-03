@@ -1,12 +1,12 @@
 ! Copyright (C) 2012 PolyMicro Systems.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data assocs byte-arrays
-byte-vectors colors.constants compiler.units core-graphics.types
-definitions fonts formatting fry hints io io.binary kernel
-kernel.private locals macros make math math.order math.parser
-namespaces prettyprint.sections sequences sequences.private slots.private sorting 
-typed ui.tools.common ui.commands ui.gestures ui.text ui.tools.listener vocabs vocabs.loader
-splitting splitting.extras vocabs.parser cocoa.classes ;
+byte-vectors colors.constants compiler.units definitions fonts fry
+hints io io.binary kernel kernel.private locals macros make math
+math.order math.parser namespaces prettyprint.sections sequences
+sequences.private slots.private sorting splitting splitting.extras
+typed ui.commands ui.gestures ui.text ui.tools.listener vocabs.loader
+vocabs.parser ;
 
 ! IN: shuffle
 ! FORGET: 4drop
@@ -14,21 +14,21 @@ splitting splitting.extras vocabs.parser cocoa.classes ;
 IN: ui.backend
 ! HOOK: (screen-size) ( -- size )
 
-IN: cocoa
+! IN: cocoa
 
-: screen-size ( -- size )
-    { }
-      NSScreen -> mainScreen -> frame
-      size>> dup
-      [ w>> prefix ] dip
-      h>> suffix ;
+! : screen-size ( -- size )
+!     { }
+!       NSScreen -> mainScreen -> frame
+!       size>> dup
+!       [ w>> prefix ] dip
+!       h>> suffix ;
 
-: auto-position ( window loc -- )
-    ! Note: if this is the initial window, the length of the windows
-    ! vector should be 1, since (open-window) calls auto-position
-    ! after register-window.
-    dup { 0 0 } =
-    [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
+! : auto-position ( window loc -- )
+!     ! Note: if this is the initial window, the length of the windows
+!     ! vector should be 1, since (open-window) calls auto-position
+!     ! after register-window.
+!     dup { 0 0 } =
+!     [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
 ! setup tool dimensions to be half screen size
 ! : set-tool-dimensions ( -- )
