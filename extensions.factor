@@ -35,13 +35,13 @@ IN: cocoa
     [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
 ! setup tool dimensions to be half screen size
-: set-tool-dimensions ( -- )
-    screen-size [ 2 / ] map
-    listener-gadget
-    tool-dims get-global
-    set-at ;
+! : set-tool-dimensions ( -- )
+!     screen-size [ 2 / ] map
+!     listener-gadget
+!     tool-dims get-global
+!     set-at ;
 
-set-tool-dimensions
+! set-tool-dimensions
 
 IN: ui
 FROM: ui.private => ui-windows ;
@@ -120,8 +120,9 @@ M: string underlying>>  2 slot { string } declare ; inline
     dup length dup
     [ 1- swap resize ]  [ drop ] if ;
 
+!  CHAR: \" = 34
 : dequote ( string -- 'string )
-    CHAR: \" swap [ = not ] with filter ;
+    34 swap [ = not ] with filter ;
 
 : string-trim-head ( str -- str )
     R/ ^\s+/ "" re-replace ;
