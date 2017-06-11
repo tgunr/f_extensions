@@ -7,7 +7,7 @@ core-graphics.types definitions effects effects.parser fonts fry
 hints io io.binary kernel kernel.private locals macros make math
 math.order math.parser namespaces parser prettyprint.sections
 regexp sequences sequences.private slots.private sorting
-splitting.extras typed ui.commands ui.gestures ui.text
+splitting splitting.extras typed ui.commands ui.gestures ui.text
 ui.tools.common ui.tools.listener vocabs.loader vocabs.parser
 words words.constant ;
 
@@ -112,6 +112,8 @@ MACRO: ?dup ( n -- quot )
     call ; 
 
 IN: strings
+FROM: splitting => split ;
+
 M: string underlying>>  2 slot { string } declare ; inline
 ! : to-string ( obj -- string )
 !     "%@" sprintf ;
