@@ -2,14 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data assocs byte-arrays
-byte-vectors cocoa.classes colors.constants compiler.units
-core-graphics.types definitions effects effects.parser fonts fry
-hints io io.binary kernel kernel.private locals macros make math
-math.order math.parser namespaces parser prettyprint.sections
-regexp sequences sequences.private slots.private sorting
-splitting splitting.extras typed ui.commands ui.gestures ui.text
-ui.tools.common ui.tools.listener vocabs.loader vocabs.parser
-words words.constant ;
+byte-vectors colors.constants compiler.units definitions
+effects.parser fonts fry help.vocabs hints io io.binary kernel
+kernel.private locals macros make math math.order math.parser
+namespaces parser prettyprint.sections regexp sequences
+sequences.private slots.private sorting splitting.extras tr typed
+ui.commands ui.gestures ui.text ui.tools.listener vocabs.loader
+vocabs.parser extensions ;
 
 ! IN: shuffle
 ! FORGET: 4drop
@@ -107,9 +106,30 @@ IN: kernel
 
 ! SYNTAX: SETCONSTANT: { } { "n" } <effect> (se:) define-declared ;
 
-MACRO: ?dup ( n -- quot )
-    dup number? [ dup zero? [ [ ] ] [ dup ] if ] [ [ ] ] if 
-    call ; 
+: ?dup ( obj -- ? )
+    dup number?
+    [ zero?
+      [ f ]
+      [ t ]
+      if
+    ]
+    [ >boolean
+      [ t ]
+      [ f ]
+      if
+    ]
+    if
+;
+
+: ??if ( ..a ? true: ( ..a ? -- ..b ) false: ( ..a -- ..b ) -- ..b )
+    pick ?dup
+    [ drop call ] [ 2nip call ] if ; inline
+
+: ??when ( ..a ? true: ( ..a ? -- ..a ) -- ..a )
+    over ?dup [ call ] [ 2drop ] if ; inline
+
+: ??unless ( ..a ? false: ( ..a -- ..a x ) -- ..a x )
+    over ?dup [ drop ] [ nip call ] if ; inline
 
 IN: strings
 FROM: splitting => split ;
@@ -140,6 +160,8 @@ M: string underlying>>  2 slot { string } declare ; inline
     R/ \s+/ " " re-replace
     ;
 
+TR: tabs>spaces "\t" "\s" ;
+    
 FROM: assocs => values ;
 IN: ui.gadgets.world
 : front-window ( -- world )
@@ -177,6 +199,10 @@ IN: sequences
     buckets values
     ;
 
+! IN: variables
+! SYNTAX: !VAR: scan-new-word [ define-variable ] keep
+!     ;
+
 IN: splitting
 : split-nth ( seq n -- seq )
     0 swap
@@ -190,21 +216,21 @@ IN: prettyprint
     "•" write ;
 
 : bullets ( n -- )
-    iota  [ drop abullet ] each ;
+    <iota>  [ drop abullet ] each ;
 
 : column-numbers ( n -- )
-    iota [ 10 mod number>string write ] each ;
+    <iota> [ 10 mod number>string write ] each ;
 
 : space ( -- )
     "\s" write ;
 
 : spaces ( n -- )
-    iota  [ drop space ] each ;
+    <iota>  [ drop space ] each ;
 
 <PRIVATE
 
 : (max-length) ( seq -- seq columnSize )
-    ! dup length "entries: %d" printf
+    ! dup dup length "entries: %s: %d" printf
     0 over [ length max ] each 1+
     ;
 
@@ -270,20 +296,36 @@ PRIVATE>
     ] with-style
     ;
 
+SYMBOL: streamed-out
+
+: streamed-out? ( -- n )
+    streamed-out get
+    [ streamed-out get ] 
+    [ 0 streamed-out set  0 ] if
+;
+
+: printh ( string -- )
+    streamed-out? over length +
+    listener-window-char-width >
+    [ nl 0 streamed-out set ]
+    [ streamed-out? over length + streamed-out set ]
+    if 
+    output-stream get stream-write ;
+
 IN: vocabs
 : current-vocab-str ( -- str )
     current-vocab name>> ;
 
 : (vwords) ( -- seq )
-    current-vocab-str vocab-words keys
+    current-vocab-str vocab-words
     ;
 
 : .vwords ( seq -- )
-    [ printx ] unless-empty
+    [ . ] unless-empty
     ;
 
 : vwords ( -- )
-    (vwords) .vwords ; 
+    current-vocab-str words. ; 
 
 : vwords-sorted ( -- )
     (vwords) natural-sort .vwords ;
