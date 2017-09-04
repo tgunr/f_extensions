@@ -3,12 +3,12 @@
 
 USING: accessors alien.c-types alien.data assocs byte-arrays
 byte-vectors colors.constants compiler.units definitions
-effects.parser fonts fry help.vocabs hints io io.binary kernel
-kernel.private locals macros make math math.order math.parser
-namespaces parser prettyprint.sections regexp sequences
-sequences.private slots.private sorting splitting.extras tr typed
-ui.commands ui.gestures ui.text ui.tools.listener vocabs.loader
-vocabs.parser extensions ;
+effects.parser extensions fonts fry help.vocabs hints io
+io.binary kernel kernel.private lexer locals macros make math
+math.order math.parser namespaces parser prettyprint.sections
+regexp sequences sequences.private slots.private sorting
+splitting.extras strings.parser tr typed ui.commands ui.gestures
+ui.text ui.tools.listener vocabs.loader vocabs.parser ;
 
 ! IN: shuffle
 ! FORGET: 4drop
@@ -159,6 +159,9 @@ M: string underlying>>  2 slot { string } declare ; inline
     ! squezze inside spaces to one
     R/ \s+/ " " re-replace
     ;
+
+: +colon-space ( string -- string' )  ": " append ;
+: +space ( string -- string' )   " " append ; 
 
 TR: tabs>spaces "\t" "\s" ;
     
@@ -387,3 +390,12 @@ IN: c-type
 : sizeof ( ctype -- size )
     props>> "c-type" swap at size>> ;
 
+IN: words
+SYNTAX: _WORD_ last-word name>> suffix! ;
+
+: (here.) ( obj name -- )  [ unparse ] dip +colon-space prepend  print ;
+SYNTAX: HERE. last-word name>> suffix!  \ (here.) suffix! ;
+
+SYNTAX: HERE" last-word name>> +colon-space  ! "for the editors sake
+    lexer get skip-blank parse-string append suffix!
+    \ print suffix! ;
