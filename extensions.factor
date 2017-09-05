@@ -10,27 +10,22 @@ regexp sequences sequences.private slots.private sorting
 splitting.extras strings.parser tr typed ui.commands ui.gestures
 ui.text ui.tools.listener vocabs.loader vocabs.parser ;
 
-! IN: shuffle
-! FORGET: 4drop
+os macosx? [
+IN: cocoa
 
-IN: ui.backend
-! HOOK: (screen-size) ( -- size )
+: screen-size ( -- size )
+    { }
+      NSScreen -> mainScreen -> frame
+      size>> dup
+      [ w>> prefix ] dip
+      h>> suffix ;
 
-! IN: cocoa
-
-! : screen-size ( -- size )
-!     { }
-!       NSScreen -> mainScreen -> frame
-!       size>> dup
-!       [ w>> prefix ] dip
-!       h>> suffix ;
-
-! : auto-position ( window loc -- )
-!     ! Note: if this is the initial window, the length of the windows
-!     ! vector should be 1, since (open-window) calls auto-position
-!     ! after register-window.
-!     dup { 0 0 } =
-!     [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
+: auto-position ( window loc -- )
+    ! Note: if this is the initial window, the length of the windows
+    ! vector should be 1, since (open-window) calls auto-position
+    ! after register-window.
+    dup { 0 0 } =
+    [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
 ! setup tool dimensions to be half screen size
 ! : set-tool-dimensions ( -- )
@@ -40,6 +35,7 @@ IN: ui.backend
 !     set-at ;
 
 ! set-tool-dimensions
+] when
 
 IN: ui
 FROM: ui.private => ui-windows ;
