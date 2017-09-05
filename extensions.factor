@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data assocs byte-arrays
-byte-vectors colors.constants compiler.units definitions
-effects.parser extensions fonts fry help.vocabs hints io
-io.binary kernel kernel.private lexer locals macros make math
-math.order math.parser namespaces parser prettyprint.sections
-regexp sequences sequences.private slots.private sorting
-splitting.extras strings.parser tr typed ui.commands ui.gestures
-ui.text ui.tools.listener vocabs.loader vocabs.parser ;
+byte-vectors cocoa.classes colors.constants compiler.units
+core-graphics.types definitions effects.parser fonts fry help.vocabs
+hints io io.binary kernel kernel.private lexer locals make math
+math.order math.parser namespaces parser prettyprint.sections regexp
+sequences sequences.private slots.private sorting splitting.extras
+strings.parser system tr typed ui.commands ui.gestures ui.text
+ui.tools.listener vocabs.loader vocabs.parser ;
 
 os macosx? [
 IN: cocoa
