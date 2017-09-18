@@ -2,41 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data assocs byte-arrays
-byte-vectors  colors.constants compiler.units
-core-graphics.types definitions effects.parser fonts fry help.vocabs
-hints io io.binary kernel kernel.private lexer locals make math
-math.order math.parser namespaces parser prettyprint.sections regexp
-sequences sequences.private slots.private sorting splitting.extras
-strings.parser system tr typed ui.commands ui.gestures ui.text
-ui.tools.listener vocabs.loader vocabs.parser ;
-
-! os macosx? [
-! USE: cocoa
-! IN: cocoa
-
-! : screen-size ( -- size )
-!     { }
-!       NSScreen -> mainScreen -> frame
-!       size>> dup
-!       [ w>> prefix ] dip
-!       h>> suffix ;
-
-! : auto-position ( window loc -- )
-!     ! Note: if this is the initial window, the length of the windows
-!     ! vector should be 1, since (open-window) calls auto-position
-!     ! after register-window.
-!     dup { 0 0 } =
-!     [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
-
-! setup tool dimensions to be half screen size
-! : set-tool-dimensions ( -- )
-!     screen-size [ 2 / ] map
-!     listener-gadget
-!     tool-dims get-global
-!     set-at ;
-
-! set-tool-dimensions
-! ] when
+byte-vectors colors.constants compiler.units
+definitions effects.parser extensions fonts
+fry help.vocabs hints io io.binary io.encodings.utf8 io.files
+kernel kernel.private lexer locals macros make math math.order
+math.parser namespaces parser prettyprint.sections regexp
+sequences sequences.private serialize slots.private sorting
+splitting.extras strings.parser system tr typed ui.commands
+ui.gestures ui.text ui.tools.listener vocabs.loader
+words variables vocabs.parser ;
 
 IN: ui
 FROM: ui.private => ui-windows ;
@@ -199,9 +173,9 @@ IN: sequences
     buckets values
     ;
 
-! IN: variables
-! SYNTAX: !VAR: scan-new-word [ define-variable ] keep
-!     ;
+IN: variables
+SYNTAX: VARIABLE!: scan-new-word define-variable last-word variable-setter suffix! ; 
+SYNTAX: VARIABLE: scan-new-word define-variable scan-object suffix! last-word variable-setter suffix! ; 
 
 IN: splitting
 : split-nth ( seq n -- seq )
@@ -390,9 +364,25 @@ IN: c-type
 IN: words
 SYNTAX: _WORD_ last-word name>> suffix! ;
 
+: (.here) ( name -- )  +colon-space print ;
 : (here.) ( obj name -- )  [ unparse ] dip +colon-space prepend  print ;
+: (here.s) ( name -- )  +colon-space print .s ;
+SYNTAX: .HERE last-word name>> suffix!  \ (.here) suffix! ;
 SYNTAX: HERE. last-word name>> suffix!  \ (here.) suffix! ;
-
+SYNTAX: HERE.S last-word name>> suffix!  \ (here.s) suffix! ;
 SYNTAX: HERE" last-word name>> +colon-space  ! "for the editors sake
     lexer get skip-blank parse-string append suffix!
     \ print suffix! ;
+
+IN: serialize
+: save-fstore ( obj path -- )
+    utf8 <file-writer> [ serialize ] with-output-stream ;
+
+: load-fstore ( path -- obj )
+    dup exists? [
+        utf8 <file-reader> [ deserialize ] with-input-stream
+    ] [
+        drop f  ! >r H{ } clone r>
+    ] if
+    ;
+
