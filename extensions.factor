@@ -3,13 +3,14 @@
 
 USING: accessors alien.c-types alien.data assocs byte-arrays
 byte-vectors colors.constants compiler.units
-definitions effects.parser extensions fonts
+editors definitions effects.parser extensions fonts
 fry help.vocabs hints io io.binary io.encodings.utf8 io.files
 kernel kernel.private lexer locals macros make math math.order
 math.parser namespaces parser prettyprint.sections regexp
 sequences sequences.private serialize slots.private sorting
 splitting.extras strings.parser system tr typed ui.commands
 ui.gestures ui.text ui.tools.listener vocabs.loader
+io.standard-paths syntax
 words variables vocabs.parser ;
 
 os macosx? [
@@ -415,3 +416,21 @@ IN: serialize
     ] if
     ;
 
+<< os macosx? [
+    IN: editors.aquamacs
+    
+    SINGLETON: aquamacs
+    aquamacs editor-class set-global
+    
+    HOOK: find-aquamacs os ( -- path )
+    
+    M: object find-aquamacs ( -- path )
+        "aquamacs" ?find-in-path ;
+    
+    M: aquamacs editor-command ( file line -- command )
+        [
+            "/usr/local/bin/aquamacs" ,
+            number>string "+" prepend ,
+            ,
+        ] { } make ;
+] when >>
