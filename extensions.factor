@@ -10,8 +10,7 @@ math.parser namespaces parser prettyprint.sections regexp
 sequences sequences.private serialize slots.private sorting
 splitting.extras strings.parser system tr typed ui.commands
 ui.gestures ui.text ui.tools.listener vocabs.loader
-io.standard-paths syntax
-words variables vocabs.parser ;
+words variables vocabs.parser io.standard-paths ;
 
 os macosx? [
     USE: cocoa.classes
@@ -43,12 +42,12 @@ os macosx? [
 ] when
 
 IN: ui
-FROM: ui.private => ui-windows ;
+FROM: ui.private => worlds ;
 : (title-is=?) ( world string -- bool )
     swap title>>  = ;
 
 : window-find-title ( string -- handle )
-    ui-windows get
+    worlds get
     [ second over (title-is=?) ] filter
     first first swap drop ;
 
@@ -122,14 +121,14 @@ IN: kernel
     if
 ;
 
-: ??if ( ..a ? true: ( ..a ? -- ..b ) false: ( ..a -- ..b ) -- ..b )
+: ??if ( ..a ? true: ( ..a -- ..b ) false: ( ..a -- ..b ) -- ..b )
     pick ?dup
     [ drop call ] [ 2nip call ] if ; inline
 
-: ??when ( ..a ? true: ( ..a ? -- ..a ) -- ..a )
+: ??when ( ..a ? true: ( ..a -- ..a ) -- ..a )
     over ?dup [ call ] [ 2drop ] if ; inline
 
-: ??unless ( ..a ? false: ( ..a -- ..a x ) -- ..a x )
+: ??unless ( ..a ? false: ( ..a -- ..a ) -- ..a )
     over ?dup [ drop ] [ nip call ] if ; inline
 
 IN: strings
@@ -169,7 +168,7 @@ TR: tabs>spaces "\t" "\s" ;
 FROM: assocs => values ;
 IN: ui.gadgets.world
 : front-window ( -- world )
-    ui-windows get
+    worlds get
     [ second focused?>> ] map-find nip
     second ; 
 
