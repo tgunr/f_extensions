@@ -2,15 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data assocs byte-arrays
-byte-vectors colors.constants compiler.units
-editors definitions effects.parser extensions fonts
-fry help.vocabs hints io io.binary io.encodings.utf8 io.files
-kernel kernel.private lexer locals macros make math math.order
+byte-vectors cocoa.classes colors.constants compiler.units
+core-graphics.types definitions editors effects effects.parser
+extensions fonts fry help.vocabs hints io io.binary
+io.encodings.utf8 io.files io.standard-paths kernel
+kernel.private lexer locals macros make math math.order
 math.parser namespaces parser prettyprint.sections regexp
 sequences sequences.private serialize slots.private sorting
 splitting.extras strings.parser system tr typed ui.commands
-ui.gestures ui.text ui.tools.listener vocabs.loader
-words variables vocabs.parser io.standard-paths ;
+ui.gestures ui.text ui.tools.listener variables vocabs.loader
+vocabs.parser words ;
 
 os macosx? [
     USE: cocoa.classes
@@ -104,7 +105,7 @@ IN: kernel
     [ scan-new-word swap parse-definition swap ]
     with-definition ;
 
-! SYNTAX: SETCONSTANT: { } { "n" } <effect> (se:) define-declared ;
+SYNTAX: SETCONSTANT: { } { "n" } <effect> (se:) define-declared ;
 
 : ?dup ( obj -- ? )
     dup number?
@@ -130,6 +131,9 @@ IN: kernel
 
 : ??unless ( ..a ? false: ( ..a -- ..a ) -- ..a )
     over ?dup [ drop ] [ nip call ] if ; inline
+
+: retain  (  x quot -- x )
+    keep swap ; inline
 
 IN: strings
 FROM: splitting => split ;
@@ -202,9 +206,10 @@ IN: sequences
     buckets values
     ;
 
-IN: variables
-SYNTAX: VARIABLE!: scan-new-word define-variable last-word variable-setter suffix! ; 
-SYNTAX: VARIABLE: scan-new-word define-variable scan-object suffix! last-word variable-setter suffix! ; 
+! IN: variables
+! SYNTAX: VARIABLE!: scan-new-word define-variable last-word variable-setter suffix! ; 
+SYNTAX: VARIABLE:  scan-new-word define-variable scan-object suffix! last-word variable-setter suffix! ; 
+! SYNTAX: QUOTE:  scan-new-word define-variable last-word scan-object change-global  last-word variable-setter suffix! ; 
 
 IN: splitting
 : split-nth ( seq n -- seq )
