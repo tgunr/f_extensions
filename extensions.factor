@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data assocs byte-arrays
-byte-vectors cocoa.classes colors.constants compiler.units
+byte-vectors  colors.constants compiler.units
 core-graphics.types definitions editors effects effects.parser
 extensions fonts fry help.vocabs hints io io.binary
 io.encodings.utf8 io.files io.standard-paths kernel
