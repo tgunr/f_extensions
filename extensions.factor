@@ -13,6 +13,35 @@ splitting.extras strings.parser system tr typed ui.commands
 ui.gestures ui.text ui.tools.listener variables vocabs.loader
 vocabs.parser words ;
 
+! os macosx? [
+!     USE: cocoa.classes
+!     USE: core-graphics.types
+!     IN: cocoa
+
+! : screen-size ( -- size )
+!     { }
+!       NSScreen -> mainScreen -> frame
+!       size>> dup
+!       [ w>> prefix ] dip
+!       h>> suffix ;
+
+! : auto-position ( window loc -- )
+!     ! Note: if this is the initial window, the length of the windows
+!     ! vector should be 1, since (open-window) calls auto-position
+!     ! after register-window.
+!     dup { 0 0 } =
+!     [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
+
+! setup tool dimensions to be half screen size
+! : set-tool-dimensions ( -- )
+!     screen-size [ 2 / ] map
+!     listener-gadget
+!     tool-dims get-global
+!     set-at ;
+
+! set-tool-dimensions
+! ] when
+
 IN: ui
 FROM: ui.private => worlds ;
 : (title-is=?) ( world string -- bool )
