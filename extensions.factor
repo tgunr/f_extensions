@@ -2,15 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data assocs byte-arrays
-byte-vectors cocoa.classes colors.constants compiler.units
-core-graphics.types definitions editors effects effects.parser
-extensions fonts fry help.vocabs hints io io.binary
+byte-vectors colors compiler.units definitions
+editors effects effects.parser
+extensions fonts fry help.vocabs hints io endian
 io.encodings.utf8 io.files io.standard-paths kernel
 kernel.private lexer locals macros make math math.order
 math.parser namespaces parser prettyprint.sections regexp
 sequences sequences.private serialize slots.private sorting
 splitting.extras strings.parser system tr typed ui.commands
-ui.gestures ui.text ui.tools.listener variables vocabs.loader
+ui.gestures ui.text ui.tools.common ui.tools.listener variables vocabs.loader
 vocabs.parser words ;
 
 os macosx? [
@@ -25,18 +25,18 @@ os macosx? [
       [ w>> prefix ] dip
       h>> suffix ;
 
-: auto-position ( window loc -- )
-    ! Note: if this is the initial window, the length of the windows
-    ! vector should be 1, since (open-window) calls auto-position
-    ! after register-window.
-    dup { 0 0 } =
-    [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
+! : auto-position ( window loc -- )
+!     ! Note: if this is the initial window, the length of the windows
+!     ! vector should be 1, since (open-window) calls auto-position
+!     ! after register-window.
+!     dup { 0 0 } =
+!     [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
 ! setup tool dimensions to be half screen size
 ! : set-tool-dimensions ( -- )
 !     screen-size [ 2 / ] map
 !     listener-gadget
-!     tool-dims get-global
+!     get-tool-dim get-global
 !     set-at ;
 
 ! set-tool-dimensions
@@ -85,21 +85,20 @@ IN: listener
 ! M: folder-entry pprint* pprint-object ;
 
 IN: kernel
-: 0? ( n -- n ? )
-    dup zero? ;
-: 0= ( n -- ? ) 0 = ;
-: 0≠ ( n -- ? ) 0 = not ;
-: ≠ ( n n -- ? ) = not ;
-: 1+ ( n -- n ) 1 + ;
-: 1- ( n -- n )  1 - ;
-: 2+ ( n -- n ) 2 + ;
-: 2- ( n -- n )  2 - ;
-: 3+ ( n -- n ) 3 + ;
-: 3- ( n -- n )  3 - ;
-: 4+ ( n -- n ) 4 + ;
-: 4- ( n -- n )  4 - ;
-: 8+ ( n -- n ) 8 + ;
-: 8- ( n -- n )  8 - ;
+: 0? ( n -- n ? )   dup zero? ;
+: 0= ( n -- ? )   0 = ;
+: 0≠ ( n -- ? )   0 = not ;
+: ≠ ( n n -- ? )   = not ;
+: 1+ ( n -- n )   1 + ;
+: 1- ( n -- n )   1 - ;
+: 2+ ( n -- n )   2 + ;
+: 2- ( n -- n )   2 - ;
+: 3+ ( n -- n )   3 + ;
+: 3- ( n -- n )   3 - ;
+: 4+ ( n -- n )   4 + ;
+: 4- ( n -- n )   4 - ;
+: 8+ ( n -- n )   8 + ;
+: 8- ( n -- n )   8 - ;
 
 : (se:) ( effect -- word def effect )
     [ scan-new-word swap parse-definition swap ]
@@ -413,12 +412,19 @@ IN: serialize
     utf8 <file-writer> [ serialize ] with-output-stream ;
 
 : load-fstore ( path -- obj )
-    dup exists? [
+    dup file-exists? [
         utf8 <file-reader> [ deserialize ] with-input-stream
     ] [
         drop f  ! >r H{ } clone r>
     ] if
     ;
+
+USE: io.pathnames
+IN: tools.scaffold 
+: scaffold-work ( string -- )
+    "Sources/FactorWork/" 
+    home prepend-path swap scaffold-vocab-in ;
+
 
 << os macosx? [
     IN: editors.aquamacs
@@ -433,8 +439,9 @@ IN: serialize
     
     M: aquamacs editor-command ( file line -- command )
         [
-            "/usr/local/bin/aquamacs" ,
+            "/Applications/Aquamacs.app/Contents/MacOS/bin/aquamacs" ,
             number>string "+" prepend ,
             ,
         ] { } make ;
+
 ] when >>

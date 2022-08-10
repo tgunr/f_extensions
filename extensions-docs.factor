@@ -5,7 +5,7 @@ IN: extensions
 
 IN: sequences
 HELP: unique-filter
-{ $values { "seq" "value" } { "quot" "value" } { "seq" "value" } }
+{ $values { "seq" "value" } { "quot" "quotation" } }
 { $description "Given a sequence containing elements which be used as keys will return the elements unique to the sequence by appling the quot to each element which is used to extract a value used as a key." }
 { $examples
   { $code 
@@ -17,7 +17,8 @@ HELP: unique-filter
 
 ARTICLE: "extensions" "Factor extensions"
 { $vocab-link "extensions" }
-"\nContains extensions to existing vocabularies in the Factor folder which have not yet been incorporated into the master branch. This permits adding to existing vocabularies without cluttering the current commit or to add to vocabularies personal preferences"
+$nl
+"Contains extensions to existing vocabularies in the Factor folder which have not yet been incorporated into the master branch. This permits adding to existing vocabularies without cluttering the current commit or to add to vocabularies personal preferences"
 ;
 
 ABOUT: "extensions"
