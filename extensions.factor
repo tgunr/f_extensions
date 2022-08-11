@@ -11,7 +11,7 @@ math.parser namespaces parser prettyprint.sections regexp
 sequences sequences.private serialize slots.private sorting
 splitting.extras strings.parser system tr typed ui.commands
 ui.gestures ui.text ui.tools.common ui.tools.listener variables vocabs.loader
-vocabs.parser words ;
+vocabs.parser words tools.scaffold themes ;
 
 os macosx? [
     USE: cocoa.classes
@@ -419,29 +419,6 @@ IN: serialize
     ] if
     ;
 
-USE: io.pathnames
-IN: tools.scaffold 
-: scaffold-work ( string -- )
-    "Sources/FactorWork/" 
-    home prepend-path swap scaffold-vocab-in ;
 
 
-<< os macosx? [
-    IN: editors.aquamacs
-    
-    SINGLETON: aquamacs
-    aquamacs editor-class set-global
-    
-    HOOK: find-aquamacs os ( -- path )
-    
-    M: object find-aquamacs ( -- path )
-        "aquamacs" ?find-in-path ;
-    
-    M: aquamacs editor-command ( file line -- command )
-        [
-            "/Applications/Aquamacs.app/Contents/MacOS/bin/aquamacs" ,
-            number>string "+" prepend ,
-            ,
-        ] { } make ;
 
-] when >>
