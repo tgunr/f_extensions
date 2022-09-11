@@ -11,7 +11,7 @@ math.parser namespaces parser prettyprint.sections regexp
 sequences sequences.private serialize slots.private sorting
 splitting.extras strings.parser system tr typed ui.commands
 ui.gestures ui.text ui.tools.common ui.tools.listener variables vocabs.loader
-vocabs.parser words tools.scaffold themes ;
+vocabs.parser words tools.scaffold ;
 
 os macosx? [
     USE: cocoa.classes
