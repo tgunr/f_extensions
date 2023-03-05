@@ -10,7 +10,8 @@ kernel.private lexer locals macros make math math.order
 math.parser namespaces parser prettyprint.sections regexp
 sequences sequences.private serialize slots.private sorting
 splitting.extras strings.parser system tr typed ui.commands
-ui.gestures ui.text ui.tools.common ui.tools.listener variables vocabs.loader
+ui.gestures ui.text ui.tools.common ui.tools.listener ui.tools.browser
+variables vocabs.loader
 vocabs.parser words tools.scaffold ;
 
 os macosx? [
@@ -32,14 +33,14 @@ os macosx? [
 !     dup { 0 0 } =
 !     [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
-! setup tool dimensions to be half screen size
+! ! setup tool dimensions to be half screen size
 ! : set-tool-dimensions ( -- )
 !     screen-size [ 2 / ] map
-!     listener-gadget
-!     get-tool-dim get-global
-!     set-at ;
+!     listener-gadget swap set-tool-dim ;
 
 ! set-tool-dimensions
+   listener-gadget [ get-tool-dim first screen-size second 1.5 / { } 2sequence ] keep  swap set-tool-dim
+   browser-gadget [ get-tool-dim first screen-size second 1.5 / { } 2sequence ] keep  swap set-tool-dim
 ] when
 
 IN: ui
