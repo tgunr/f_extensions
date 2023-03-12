@@ -206,8 +206,8 @@ IN: sequences
     buckets values
     ;
 
-! IN: variables
-! SYNTAX: VARIABLE!: scan-new-word define-variable last-word variable-setter suffix! ; 
+IN: variables
+SYNTAX: VARIABLE!: scan-new-word define-variable last-word variable-setter suffix! ; 
 SYNTAX: VARIABLE:  scan-new-word define-variable scan-object suffix! last-word variable-setter suffix! ; 
 ! SYNTAX: QUOTE:  scan-new-word define-variable last-word scan-object change-global  last-word variable-setter suffix! ; 
 
@@ -420,6 +420,8 @@ IN: serialize
     ] if
     ;
 
-
-
+IN: math.parser
+: >number ( string|number -- number )
+    dup string?
+    [ string>number ] when ; 
 
