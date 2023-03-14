@@ -1,18 +1,17 @@
 ! Copyright (C) 2012 PolyMicro Systems.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien.c-types alien.data assocs byte-arrays
-byte-vectors colors compiler.units definitions
-editors effects effects.parser
-extensions fonts fry help.vocabs hints io endian
-io.encodings.utf8 io.files io.standard-paths kernel
-kernel.private lexer locals macros make math math.order
-math.parser namespaces parser prettyprint.sections regexp
-sequences sequences.private serialize slots.private sorting
-splitting.extras strings.parser system tr typed ui.commands
-ui.gestures ui.text ui.tools.common ui.tools.listener ui.tools.browser
-variables vocabs.loader
-vocabs.parser words tools.scaffold ;
+USING: accessors alien.c-types alien.data assocs byte-arrays byte-vectors
+ cocoa.classes colors compiler.units core-graphics.types definitions editors
+ effects effects.parser endian extensions fonts fry
+ help.vocabs hints io io.encodings.utf8 io.files io.standard-paths
+ kernel kernel.private lexer locals macros make
+ math math.order math.parser namespaces parser prettyprint.sections
+ regexp sequences sequences.private serialize slots.private sorting
+ splitting.extras strings strings.parser system tools.scaffold tr
+ typed ui.clipboards ui.commands ui.gestures ui.text ui.tools.browser
+ ui.tools.common ui.tools.listener variables vocabs.loader vocabs.parser words
+    ;
 
 os macosx? [
     USE: cocoa.classes
@@ -420,8 +419,16 @@ IN: serialize
     ] if
     ;
 
+
+USING: strings ;
 IN: math.parser
 : >number ( string|number -- number )
-    dup string?
-    [ string>number ] when ; 
+    dup string? [ string>number ] when ;
+
+IN: scratchpad
+: >usings ( vocabs -- )
+    [ name>> ] map
+    "" [ 1 + 6 mod 0 = [ "\n" append ] when  " " append append ] reduce-index
+    "USING: " prepend " ;" append
+    clipboard get set-clipboard-contents ;
 
