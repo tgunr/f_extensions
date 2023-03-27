@@ -85,11 +85,11 @@ IN: listener
 ! IN: folder
 ! M: folder-entry pprint* pprint-object ;
 
-IN: kernel
-: 0? ( n -- n ? )   dup zero? ;
+IN: syntax.terse
 : 0= ( n -- ? )   0 = ;
 : 0≠ ( n -- ? )   0 = not ;
 : ≠ ( n n -- ? )   = not ;
+: != ( n n -- ? )   = not ;
 : 1+ ( n -- n )   1 + ;
 : 1- ( n -- n )   1 - ;
 : 2+ ( n -- n )   2 + ;
@@ -100,37 +100,6 @@ IN: kernel
 : 4- ( n -- n )   4 - ;
 : 8+ ( n -- n )   8 + ;
 : 8- ( n -- n )   8 - ;
-
-: (se:) ( effect -- word def effect )
-    [ scan-new-word swap parse-definition swap ]
-    with-definition ;
-
-SYNTAX: SETCONSTANT: { } { "n" } <effect> (se:) define-declared ;
-
-: ?dup ( obj -- ? )
-    dup number?
-    [ zero?
-      [ f ]
-      [ t ]
-      if
-    ]
-    [ >boolean
-      [ t ]
-      [ f ]
-      if
-    ]
-    if
-;
-
-: ??if ( ..a ? true: ( ..a -- ..b ) false: ( ..a -- ..b ) -- ..b )
-    pick ?dup
-    [ drop call ] [ 2nip call ] if ; inline
-
-: ??when ( ..a ? true: ( ..a -- ..a ) -- ..a )
-    over ?dup [ call ] [ 2drop ] if ; inline
-
-: ??unless ( ..a ? false: ( ..a -- ..a ) -- ..a )
-    over ?dup [ drop ] [ nip call ] if ; inline
 
 : retain  (  x quot -- x )
     keep swap ; inline
@@ -144,10 +113,6 @@ M: string underlying>>  2 slot { string } declare ; inline
 : string>seq ( string -- seq )   " " split ;
 : string-expand ( string -- seq ) [ 1string ] { } map-as ; 
 : bool>string ( ? -- s )   [ "t" ] [ "f" ] if ;
-
-: chop ( str -- str )
-    dup length dup
-    [ 1- swap resize ]  [ drop ] if ;
 
 !  CHAR: \" = 34
 : dequote ( string -- 'string )
@@ -169,6 +134,46 @@ M: string underlying>>  2 slot { string } declare ; inline
 
 TR: tabs>spaces "\t" "\s" ;
     
+: space? ( ch -- ? ) 32 = ;
+
+: tab? ( ch -- ? ) 9 = ;
+
+: trim-whitespace ( str -- str' )
+    [ [ space? ] [ tab? ] bi or ] trim-head
+    [ [ space? ] [ tab? ] bi or ] trim-tail
+    ;
+
+: soft-quote ( string -- string' )
+    "\"" dup surround ;
+
+: hard-quote ( string -- string' )
+    "'" dup surround ;
+
+: escape-string-by ( str table -- escaped )
+    ! Convert $ ( ) ' and " to shell escapes
+    [ '[ [ _ at ] [ % ] [ , ] ?if ] each ] "" make ; inline
+
+CONSTANT: PATH_ESCAPE_CHARS H{
+       { CHAR: \s "\\ "  }
+       { CHAR: \n "?"    }
+       { CHAR: (  "\\("  }
+       { CHAR: )  "\\)"  }
+       { CHAR: &  "\\&"  }
+       { CHAR: $  "\\$"  }
+       { CHAR: ;  "\\;"  }
+       { CHAR: "  "\""   }      ! for editor's sake "
+       { CHAR: '  "\\'"  } 
+       { CHAR: `  "\\`"  }
+       }
+       
+: escape-string ( str -- str' )
+    PATH_ESCAPE_CHARS escape-string-by ;
+    ! [ dup
+    !   [ PATH_ESCAPE_CHARS at ] [ nip ] [ drop 1string ] ?if
+    ! ] { } map-as
+    ! "" join ; 
+
+
 FROM: assocs => values ;
 IN: ui.gadgets.world
 : front-window ( -- world )
@@ -368,22 +373,6 @@ HINTS: M\ object random-characters* { fixnum object } ;
 TYPED: random-characters ( n: fixnum -- byte-array: byte-array )
     random-generator get random-characters* ; inline
 
-IN: listener
-: history@ ( history -- seq )
-    elements>> ;
-
-: .history ( -- )
-    get-listener input>> history>> elements>>
-    [ string>> ] map
-    .
-    ;
-
-listener-gadget "history"
-"The listener's history can be scrolled from the keyboard."
-{
-    { T{ key-down f { C+ } "y" } .history }
-} define-command-map
-
 IN: classes.struct
 : detach>number ( seq n -- seq number )  detach-nth be> ;
 
@@ -419,6 +408,11 @@ IN: serialize
         drop f  ! >r H{ } clone r>
     ] if
     ;
+
+USING: strings ;
+IN: math.parser
+: >number ( string|number -- number )
+    dup string? [ string>number ] when ;
 
 
 
