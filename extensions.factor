@@ -172,7 +172,6 @@ CONSTANT: PATH_ESCAPE_CHARS H{
     ! ] { } map-as
     ! "" join ; 
 
-
 FROM: assocs => values ;
 IN: ui.gadgets.world
 : front-window ( -- world )
@@ -407,12 +406,6 @@ IN: serialize
         drop f  ! >r H{ } clone r>
     ] if
     ;
-
-USING: strings ;
-IN: math.parser
-: >number ( string|number -- number )
-    dup string? [ string>number ] when ;
-
 
 USING: strings ;
 IN: math.parser
