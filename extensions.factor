@@ -1,51 +1,24 @@
 ! Copyright (C) 2012 PolyMicro Systems.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien.c-types alien.data assocs byte-arrays byte-vectors
- cocoa.classes colors compiler.units core-graphics.types definitions editors
- effects effects.parser endian extensions fonts fry
- help.vocabs hints io io.encodings.utf8 io.files io.standard-paths
- kernel kernel.private lexer locals macros make
- math math.order math.parser namespaces parser prettyprint.sections
- regexp sequences sequences.private serialize slots.private sorting
- splitting.extras strings strings.parser system tools.scaffold tr
- typed ui.clipboards ui.commands ui.gestures ui.text ui.tools.browser
- ui.tools.common ui.tools.listener variables vocabs.loader vocabs.parser words
-    ;
-
-os macosx? [
-    USE: cocoa.classes
-    USE: core-graphics.types
-    IN: cocoa
-
-: screen-size ( -- size )
-    { }
-      NSScreen -> mainScreen -> frame
-      size>> dup
-      [ w>> prefix ] dip
-      h>> suffix ;
-
-! : auto-position ( window loc -- )
-!     ! Note: if this is the initial window, the length of the windows
-!     ! vector should be 1, since (open-window) calls auto-position
-!     ! after register-window.
-!     dup { 0 0 } =
-!     [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
-
-! ! setup tool dimensions to be half screen size
-! : set-tool-dimensions ( -- )
-!     screen-size [ 2 / ] map
-!     listener-gadget swap set-tool-dim ;
-
-! set-tool-dimensions
-   listener-gadget [ get-tool-dim first screen-size second 1.5 / { } 2sequence ] keep  swap set-tool-dim
-   browser-gadget [ get-tool-dim first screen-size second 1.5 / { } 2sequence ] keep  swap set-tool-dim
-] when
+USING: accessors alien.c-types alien.data assocs byte-arrays
+byte-vectors compiler.units colors
+editors definitions effects.parser extensions fonts
+fry help.vocabs hints io io.encodings.utf8 io.files
+kernel kernel.private lexer locals macros make math math.order
+math.parser namespaces parser prettyprint.sections regexp
+sequences sequences.private serialize slots.private sorting
+splitting.extras strings.parser system tr typed ui.commands
+ui.gestures ui.text ui.private ui.tools.listener vocabs.loader
+io.standard-paths syntax
+words variables vocabs.parser ;
 
 IN: ui
-FROM: ui.private => worlds ;
 : (title-is=?) ( world string -- bool )
     swap title>>  = ;
+
+: ui-windows ( -- worlds )
+    worlds get-global values ;
 
 : window-find-title ( string -- handle )
     worlds get
@@ -113,6 +86,10 @@ M: string underlying>>  2 slot { string } declare ; inline
 : string-expand ( string -- seq ) [ 1string ] { } map-as ; 
 : bool>string ( ? -- s )   [ "t" ] [ "f" ] if ;
 
+: chop ( str -- str )
+    dup length dup
+    [ 1- swap resize ]  [ drop ] if ;
+
 !  CHAR: \" = 34
 : dequote ( string -- 'string )
     34 swap [ = not ] with filter ;
@@ -175,7 +152,7 @@ CONSTANT: PATH_ESCAPE_CHARS H{
 FROM: assocs => values ;
 IN: ui.gadgets.world
 : front-window ( -- world )
-    worlds get
+    ui-windows 
     [ second focused?>> ] map-find nip
     second ; 
 
@@ -371,6 +348,23 @@ HINTS: M\ object random-characters* { fixnum object } ;
 TYPED: random-characters ( n: fixnum -- byte-array: byte-array )
     random-generator get random-characters* ; inline
 
+IN: listener
+: history@ ( history -- seq )
+    elements>> ;
+
+: .history ( -- )
+    get-listener input>> history>> elements>>
+    [ string>> ] map
+    .
+    ;
+
+listener-gadget "history"
+"The listener's history can be scrolled from the keyboard."
+{
+    { T{ key-down f { C+ } "y" } .history }
+} define-command-map
+
+USE: endian
 IN: classes.struct
 : detach>number ( seq n -- seq number )  detach-nth be> ;
 
