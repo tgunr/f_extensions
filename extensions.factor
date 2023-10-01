@@ -2,53 +2,25 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data assocs byte-arrays
-byte-vectors colors.constants compiler.units
+byte-vectors compiler.units colors
 editors definitions effects.parser extensions fonts
-fry help.vocabs hints io io.binary io.encodings.utf8 io.files
+fry help.vocabs hints io io.encodings.utf8 io.files
 kernel kernel.private lexer locals macros make math math.order
 math.parser namespaces parser prettyprint.sections regexp
 sequences sequences.private serialize slots.private sorting
 splitting.extras strings.parser system tr typed ui.commands
-ui.gestures ui.text ui.tools.listener vocabs.loader
+ui.gestures ui.text ui.private ui.tools.listener vocabs.loader
 io.standard-paths syntax
 words variables vocabs.parser ;
 
-os macosx? [
-    USE: cocoa.classes
-    USE: core-graphics.types
-    IN: cocoa
-
-: screen-size ( -- size )
-    { }
-      NSScreen -> mainScreen -> frame
-      size>> dup
-      [ w>> prefix ] dip
-      h>> suffix ;
-
-: auto-position ( window loc -- )
-    ! Note: if this is the initial window, the length of the windows
-    ! vector should be 1, since (open-window) calls auto-position
-    ! after register-window.
-    dup { 0 0 } =
-    [ 2drop ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
-
-! setup tool dimensions to be half screen size
-! : set-tool-dimensions ( -- )
-!     screen-size [ 2 / ] map
-!     listener-gadget
-!     tool-dims get-global
-!     set-at ;
-
-! set-tool-dimensions
-] when
-
 IN: ui
-FROM: ui.private => ui-windows ;
 : (title-is=?) ( world string -- bool )
     swap title>>  = ;
 
+: ui-windows ( -- worlds )
+    worlds get-global values ;
+
 : window-find-title ( string -- handle )
-    ui-windows get
     [ second over (title-is=?) ] filter
     first first swap drop ;
 
@@ -169,7 +141,7 @@ TR: tabs>spaces "\t" "\s" ;
 FROM: assocs => values ;
 IN: ui.gadgets.world
 : front-window ( -- world )
-    ui-windows get
+    ui-windows 
     [ second focused?>> ] map-find nip
     second ; 
 
@@ -380,6 +352,7 @@ listener-gadget "history"
     { T{ key-down f { C+ } "y" } .history }
 } define-command-map
 
+USE: endian
 IN: classes.struct
 : detach>number ( seq n -- seq number )  detach-nth be> ;
 
@@ -409,7 +382,7 @@ IN: serialize
     utf8 <file-writer> [ serialize ] with-output-stream ;
 
 : load-fstore ( path -- obj )
-    dup exists? [
+    dup file-exists? [
         utf8 <file-reader> [ deserialize ] with-input-stream
     ] [
         drop f  ! >r H{ } clone r>
